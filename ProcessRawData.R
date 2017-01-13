@@ -37,3 +37,57 @@ ReturnDataWithXY <- subset(TaggingData, !is.na(RLONGDD))
 
 RedSnapper <- subset(ReturnDataWithXY, SPECIES=="RED SNAPPER") 
 write.csv(RedSnapper, "RedSnapper.csv", row.names=FALSE)
+
+library(sp)
+
+## Make a spatial object of tagging data
+TagXY <- RedSnapper
+coordinates(TagXY) <- ~TLONGDD + TLATDD
+
+## Make a spatial object of tagging data
+ReturnXY <- RedSnapper
+coordinates(ReturnXY) <- ~RLONGDD + RLATDD
+
+library(leaflet)
+library(mapview)
+map <- leaflet() %>% 
+  
+  # addTiles('http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}',
+  #          options = list(providerTileOptions(noWrap = TRUE)) ) %>%
+  addTiles('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+           options = providerTileOptions(noWrap = TRUE), group="World Imagery") %>%
+  addTiles('http://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/Mapserver/tile/{z}/{y}/{x}',
+           options = providerTileOptions(noWrap = TRUE),group="Labels") %>%  
+  #setView(-79.61663461, 27.7623829, zoom = 6) %>% 
+  addMouseCoordinates() %>% 
+  
+  addCircleMarkers(data=TagXY,  color="#A0A0A0",
+                   #fillColor = "#FDE725",
+                   fillColor = "#FFFF00",
+                   fillOpacity = 0.85,
+                   radius = ~3,
+                   stroke = TRUE,
+                   weight=1,
+                   group="Tag"
+                    ) %>%
+  
+  addCircleMarkers(data=ReturnXY,  color="#A0A0A0",
+                   fillColor = "#C42A77",
+                   #fillColor = "#FFFF00",
+                   fillOpacity = 0.85,
+                   radius = ~3,
+                   stroke = TRUE,
+                   weight=1,
+                   group="Return"
+  ) %>% 
+  
+  # addLegend(position = "bottomright", #fillColor = "#FDE725",
+  #           pal = binpal, values = gsumSP$Year,
+  #           title="Red Snapper Tag and Recapturre", 
+  #           labFormat=labelFormat(big.mark="")) #%>% 
+addLayersControl(
+  overlayGroups = c("Tag", "Return"),
+  position=c("bottomright"),
+  options = layersControlOptions(collapsed = FALSE)
+                )
+
