@@ -15,22 +15,25 @@ TLONGDD = (grp2$TLONGDEG + (grp2$TLONGMIN/60))*-1;
 RLATDD = grp2$RLATDEG + (grp2$RLATMIN/60);
 RLONGDD = (grp2$RLONGDEG + (grp2$RLONGMIN/60))*-1;
 xy <- data.frame(TLONGDD=TLONGDD,TLATDD=TLATDD, RLONGDD=RLONGDD, RLATDD=RLATDD)
-TaggingData <- cbind(TLONGDD=xy$TLONGDD, 
+TaggingData <- data.frame(TLONGDD=xy$TLONGDD, 
                      TLATDD=xy$TLATDD, 
                      RLONGDD=xy$RLONGDD, 
                      RLATDD=xy$RLATDD,
                      TAGNO=grp2$TAGNO,
                      SPECIES=grp2$SPECIES, 
-                     TDATE=as.Date(grp2$TDATE),
+                     TDATE=as.Date(grp2$TDATE, "%m/%d/%Y"),
                      UNIQUE=grp2$UNIQUE, 
                      TGEAR=grp2$TGEAR,
                      HOOKTYPE=grp2$HOOKTYPE,
                      TDEPTHFT=grp2$TDEPTHFT,
                      TLENIN=grp2$TLENIN, 
                      TWTLBS=grp2$TWTLBS,
-                     RDATE=grp2$RDATE, 
+                     RDATE= as.Date(grp2$RDATE, "%m/%d/%Y"), 
                      RGEAR=grp2$RGEAR,
                      RETDEPTH=grp2$RETDEPTH 
                      )
         
 ReturnDataWithXY <- subset(TaggingData, !is.na(RLONGDD))
+
+RedSnapper <- subset(ReturnDataWithXY, SPECIES=="RED SNAPPER") 
+write.csv(RedSnapper, "RedSnapper.csv", row.names=FALSE)
